@@ -75,10 +75,10 @@ def patch_tf_keras():
     old_generator = training_generator.fit_generator
 
     def set_wandb_attrs(cbk, val_data):
-        if cbk.validation_data is not None or cbk.generator is not None:
-            return 
-            
         if isinstance(cbk, WandbCallback):
+            if cbk.validation_data is not None or cbk.generator is not None:
+                return 
+                
             if is_generator_like(val_data):
                 cbk.generator = val_data
             elif is_dataset(val_data):
@@ -282,6 +282,14 @@ class WandbCallback(keras.callbacks.Callback):
             else:
                 self.monitor_op = operator.lt
                 self.best = float('inf')
+
+    @property
+    def generator(self):
+        return self._generator
+
+    @generator.setter
+    def generator(self, value):
+        self._generator = value
 
     def _implements_train_batch_hooks(self):
         return self.log_batch_frequency is not None
