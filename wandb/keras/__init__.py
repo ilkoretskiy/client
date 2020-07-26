@@ -75,6 +75,9 @@ def patch_tf_keras():
     old_generator = training_generator.fit_generator
 
     def set_wandb_attrs(cbk, val_data):
+        if cbk.validation_data is not None or cbk.generator is not None:
+            return 
+            
         if isinstance(cbk, WandbCallback):
             if is_generator_like(val_data):
                 cbk.generator = val_data
